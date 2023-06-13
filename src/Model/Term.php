@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Corcel\Model;
 
 use Corcel\Concerns\AdvancedCustomFields;
 use Corcel\Concerns\MetaFields;
-use Corcel\Model;
 
 /**
  * Class Term.
@@ -12,24 +13,18 @@ use Corcel\Model;
  * @package Corcel\Model
  * @author Junior Grossi <juniorgro@gmail.com>
  */
-class Term extends Model
+class Term extends \Illuminate\Database\Eloquent\Model
 {
     use MetaFields;
     use AdvancedCustomFields;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $table = 'terms';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $primaryKey = 'term_id';
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     public $timestamps = false;
 
     /**

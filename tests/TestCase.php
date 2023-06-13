@@ -6,7 +6,6 @@ use Corcel\Laravel\CorcelServiceProvider;
 use Corcel\Model\User;
 use Corcel\Tests\Unit\Model\FakePage;
 use Corcel\Tests\Unit\Model\FakePost;
-use Corcel\Tests\Unit\Model\FakeShortcode;
 use Illuminate\Contracts\Auth\Authenticatable;
 
 /**
@@ -40,10 +39,9 @@ class TestCase extends \Orchestra\Testbench\TestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-        $this->configureDatabaseConfig($app);
-        $this->configureAuthProvider($app);
-        $this->configureCustomPostTypes($app);
-        $this->configureShortcodes($app);
+        // $this->configureDatabaseConfig($app);
+        // $this->configureAuthProvider($app);
+        // $this->configureCustomPostTypes($app);
     }
 
     /**
@@ -51,19 +49,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
      */
     private function configureDatabaseConfig($app)
     {
-        $app['config']->set('database.connections.wp', [
-            'driver'   => 'sqlite',
-            'database' => ':memory:',
-            'prefix'   => 'wp_',
-        ]);
-
-        $app['config']->set('database.connections.foo', [
-            'driver'   => 'sqlite',
-            'database' => ':memory:',
-            'prefix'   => 'foo_',
-        ]);
-
-        $app['config']->set('database.default', 'wp');
+        // TODO: nope
     }
 
     /**
@@ -71,10 +57,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
      */
     private function configureAuthProvider($app)
     {
-        $app['config']->set('auth.providers.users', [
-            'driver' => 'corcel',
-            'model' => User::class,
-        ]);
+        // TODO: nope
     }
 
     /**
@@ -82,20 +65,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
      */
     private function configureCustomPostTypes($app)
     {
-        $app['config']->set('corcel.post_types', [
-            'fake_post' => FakePost::class,
-            'fake_page' => FakePage::class,
-        ]);
-    }
-
-    /**
-     * @param \Illuminate\Foundation\Application $app
-     */
-    public function configureShortcodes($app)
-    {
-        $app['config']->set('corcel.shortcodes', [
-            'fake' => FakeShortcode::class,
-        ]);
+        // TODO: nope
     }
 
     /**

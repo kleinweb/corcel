@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Corcel\Model;
 
-use Corcel\Model;
 use Corcel\Model\Builder\TaxonomyBuilder;
 use Corcel\Model\Meta\TermMeta;
 
@@ -12,26 +13,18 @@ use Corcel\Model\Meta\TermMeta;
  * @package Corcel\Model
  * @author Junior Grossi <juniorgro@gmail.com>
  */
-class Taxonomy extends Model
+class Taxonomy extends \Illuminate\Database\Eloquent\Model
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $table = 'term_taxonomy';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $primaryKey = 'term_taxonomy_id';
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $with = ['term'];
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     public $timestamps = false;
 
     /**
@@ -41,7 +34,7 @@ class Taxonomy extends Model
     {
         return $this->hasMany(TermMeta::class, 'term_id');
     }
-    
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -55,7 +48,7 @@ class Taxonomy extends Model
      */
     public function parent()
     {
-        return $this->belongsTo(Taxonomy::class, 'parent');
+        return $this->belongsTo(self::class, 'parent');
     }
 
     /**
@@ -73,7 +66,8 @@ class Taxonomy extends Model
 
     /**
      * @param \Illuminate\Database\Query\Builder $query
-     * @return TaxonomyBuilder
+     *
+     * @return \Corcel\Model\Builder\TaxonomyBuilder
      */
     public function newEloquentBuilder($query)
     {
@@ -81,7 +75,7 @@ class Taxonomy extends Model
     }
 
     /**
-     * @return TaxonomyBuilder
+     * @return \Corcel\Model\Builder\TaxonomyBuilder
      */
     public function newQuery()
     {
@@ -94,6 +88,7 @@ class Taxonomy extends Model
      * Magic method to return the meta data like the post original fields.
      *
      * @param string $key
+     *
      * @return string
      */
     public function __get($key)

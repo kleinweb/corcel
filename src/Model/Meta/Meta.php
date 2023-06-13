@@ -2,7 +2,6 @@
 
 namespace Corcel\Model\Meta;
 
-use Corcel\Model;
 use Corcel\Model\Collection\MetaCollection;
 use Exception;
 
@@ -12,7 +11,7 @@ use Exception;
  * @package Corcel\Model\Meta
  * @author Junior Grossi <juniorgro@gmail.com>
  */
-abstract class Meta extends Model
+abstract class Meta extends \Illuminate\Database\Eloquent\Model
 {
     /**
      * @var string
@@ -47,6 +46,7 @@ abstract class Meta extends Model
 
     /**
      * @param array $models
+     *
      * @return MetaCollection
      */
     public function newCollection(array $models = [])

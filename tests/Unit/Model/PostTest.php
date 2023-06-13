@@ -9,10 +9,8 @@ use Corcel\Model\Post;
 use Corcel\Model\Taxonomy;
 use Corcel\Model\Term;
 use Corcel\Model\User;
-use Corcel\Shortcode;
 use Illuminate\Support\Arr;
 use Illuminate\Pagination\Paginator;
-use Thunder\Shortcode\Shortcode\ShortcodeInterface;
 
 /**
  * Class PostTest
@@ -297,7 +295,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals($post->post_title, $firstPost->post_title);
         $this->assertMatchesRegularExpression('/\<nav\>\s*\<ul class="pagination/', $paginator->toHtml());
     }
-    
+
     public function test_it_can_have_taxonomy()
     {
         $post = $this->createPostWithTaxonomiesAndTerms();
@@ -424,49 +422,6 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals($revision->fresh(), $revisions->first());
     }
 
-    public function test_it_can_have_shortcode()
-    {
-        $this->registerFooShortcode();
-
-        $post = factory(Post::class)->create([
-            'post_content' => 'test [foo a="bar" b="baz"]',
-        ]);
-
-        $this->assertEquals($post->content, 'test foo.bar.baz');
-    }
-
-    public function test_it_can_have_shortcode_from_config_file()
-    {
-        $post = factory(Post::class)->create([
-            'post_content' => 'foo [fake one="two"]',
-        ]);
-
-        $this->assertEquals('foo html-for-shortcode-fake-two', $post->content);
-    }
-
-    public function test_its_content_can_have_multiple_shortcodes()
-    {
-        $this->registerFooShortcode();
-
-        $post = factory(Post::class)->create([
-            'post_content' => '1~[foo a="bar" b="baz"] 2~[foo a="baz" b="bar"]',
-        ]);
-
-        $this->assertEquals($post->content, '1~foo.bar.baz 2~foo.baz.bar');
-    }
-
-    public function test_its_shortcode_can_be_removed()
-    {
-        $this->registerFooShortcode();
-        Post::removeShortcode('foo');
-
-        $post = factory(Post::class)->create([
-            'post_content' => 'test [foo a="bar" b="baz"]',
-        ]);
-
-        $this->assertEquals($post->content, 'test [foo a="bar" b="baz"]');
-    }
-
     public function test_it_can_have_post_format()
     {
         $post = $this->createPostWithPostFormatTaxonomy();
@@ -577,18 +532,6 @@ class PostTest extends \Corcel\Tests\TestCase
         return $post;
     }
 
-    private function registerFooShortcode(): void
-    {
-        Post::addShortcode('foo', function (ShortcodeInterface $shortcode) {
-            return sprintf(
-                '%s.%s.%s',
-                $shortcode->getName(),
-                $shortcode->getParameter('a'),
-                $shortcode->getParameter('b')
-            );
-        });
-    }
-
     private function createPostWithPostFormatTaxonomy(): Post
     {
         $post = factory(Post::class)->create();
@@ -609,17 +552,5 @@ class PostTest extends \Corcel\Tests\TestCase
         );
 
         return $post;
-    }
-}
-
-class FakeShortcode implements Shortcode
-{
-    public function render(ShortcodeInterface $shortcode): string
-    {
-        return sprintf(
-            'html-for-shortcode-%s-%s',
-            $shortcode->getName(),
-            $shortcode->getParameter('one')
-        );
     }
 }

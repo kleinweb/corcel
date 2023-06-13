@@ -4,7 +4,6 @@ namespace Corcel\Model;
 
 use Corcel\Concerns\CustomTimestamps;
 use Corcel\Concerns\MetaFields;
-use Corcel\Model;
 use Corcel\Model\Builder\CommentBuilder;
 
 /**
@@ -13,7 +12,7 @@ use Corcel\Model\Builder\CommentBuilder;
  * @package Corcel\Model
  * @author Junior Grossi <juniorgro@gmail.com>
  */
-class Comment extends Model
+class Comment extends \Illuminate\Database\Eloquent\Model
 {
     use MetaFields;
     use CustomTimestamps;
@@ -40,6 +39,7 @@ class Comment extends Model
      * Find a comment by post ID.
      *
      * @param int $postId
+     *
      * @return Comment
      */
     public static function findByPostId($postId)
@@ -107,6 +107,7 @@ class Comment extends Model
 
     /**
      * @param \Illuminate\Database\Query\Builder $query
+     *
      * @return CommentBuilder
      */
     public function newEloquentBuilder($query)
@@ -116,6 +117,7 @@ class Comment extends Model
 
     /**
      * @param mixed $value
+     *
      * @return void
      */
     public function setUpdatedAt($value)

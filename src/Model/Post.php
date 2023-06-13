@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Corcel\Model;
 
 use Corcel\Concerns\AdvancedCustomFields;
@@ -7,9 +9,6 @@ use Corcel\Concerns\Aliases;
 use Corcel\Concerns\CustomTimestamps;
 use Corcel\Concerns\MetaFields;
 use Corcel\Concerns\OrderScopes;
-use Corcel\Concerns\Shortcodes;
-use Corcel\Corcel;
-use Corcel\Model;
 use Corcel\Model\Builder\PostBuilder;
 use Corcel\Model\Meta\ThumbnailMeta;
 
@@ -20,46 +19,33 @@ use Corcel\Model\Meta\ThumbnailMeta;
  * @author Junior Grossi <juniorgro@gmail.com>
  * @author Mickael Burguet <www.rundef.com>
  */
-class Post extends Model
+class Post extends \Illuminate\Database\Eloquent\Model
 {
     use Aliases;
     use AdvancedCustomFields;
     use MetaFields;
-    use Shortcodes;
     use OrderScopes;
     use CustomTimestamps;
 
     const CREATED_AT = 'post_date';
     const UPDATED_AT = 'post_modified';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $table = 'posts';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $primaryKey = 'ID';
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $dates = ['post_date', 'post_date_gmt', 'post_modified', 'post_modified_gmt'];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $with = ['meta'];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected static $postTypes = [];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $fillable = [
         'post_content',
         'post_title',
@@ -70,9 +56,7 @@ class Post extends Model
         'post_content_filtered',
     ];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $appends = [
         'title',
         'slug',
@@ -93,9 +77,7 @@ class Post extends Model
         'keywords_str',
     ];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected static $aliases = [
         'title' => 'post_title',
         'content' => 'post_content',
@@ -113,16 +95,17 @@ class Post extends Model
 
     /**
      * @param array $attributes
-     * @param null $connection
+     * @param null  $connection
+     *
      * @return mixed
      */
     public function newFromBuilder($attributes = [], $connection = null)
     {
-        $model = $this->getPostInstance((array)$attributes);
+        $model = $this->getPostInstance((array) $attributes);
 
         $model->exists = true;
 
-        $model->setRawAttributes((array)$attributes, true);
+        $model->setRawAttributes((array) $attributes, true);
 
         $model->setConnection(
             $connection ?: $this->getConnectionName()
@@ -135,6 +118,7 @@ class Post extends Model
 
     /**
      * @param array $attributes
+     *
      * @return array
      */
     protected function getPostInstance(array $attributes)
@@ -145,11 +129,6 @@ class Post extends Model
         if (isset($attributes['post_type']) && $attributes['post_type']) {
             if (isset(static::$postTypes[$attributes['post_type']])) {
                 $class = static::$postTypes[$attributes['post_type']];
-            } elseif (Corcel::isLaravel()) {
-                $postTypes = config('corcel.post_types');
-                if (is_array($postTypes) && isset($postTypes[$attributes['post_type']])) {
-                    $class = $postTypes[$attributes['post_type']];
-                }
             }
         }
 
@@ -158,7 +137,8 @@ class Post extends Model
 
     /**
      * @param \Illuminate\Database\Query\Builder $query
-     * @return PostBuilder
+     *
+     * @return \Corcel\Model\Builder\PostBuilder
      */
     public function newEloquentBuilder($query)
     {
@@ -166,7 +146,7 @@ class Post extends Model
     }
 
     /**
-     * @return PostBuilder
+     * @return \Corcel\Model\Builder\PostBuilder
      */
     public function newQuery()
     {
@@ -218,7 +198,7 @@ class Post extends Model
      */
     public function parent()
     {
-        return $this->belongsTo(Post::class, 'post_parent');
+        return $this->belongsTo(self::class, 'post_parent');
     }
 
     /**
@@ -226,7 +206,7 @@ class Post extends Model
      */
     public function children()
     {
-        return $this->hasMany(Post::class, 'post_parent');
+        return $this->hasMany(self::class, 'post_parent');
     }
 
     /**
@@ -234,7 +214,7 @@ class Post extends Model
      */
     public function attachment()
     {
-        return $this->hasMany(Post::class, 'post_parent')
+        return $this->hasMany(self::class, 'post_parent')
             ->where('post_type', 'attachment');
     }
 
@@ -243,7 +223,7 @@ class Post extends Model
      */
     public function revision()
     {
-        return $this->hasMany(Post::class, 'post_parent')
+        return $this->hasMany(self::class, 'post_parent')
             ->where('post_type', 'revision');
     }
 
@@ -252,6 +232,7 @@ class Post extends Model
      *
      * @param string $taxonomy
      * @param string $term
+     *
      * @return bool
      */
     public function hasTerm($taxonomy, $term)
@@ -268,21 +249,21 @@ class Post extends Model
         return $this->postType;
     }
 
-    /**
-     * @return string
-     */
-    public function getContentAttribute()
-    {
-        return $this->stripShortcodes($this->post_content);
-    }
+    // /**
+    // * @return string
+    // */
+    // public function getContentAttribute()
+    // {
+    // return $this->stripShortcodes($this->post_content);
+    // }
 
-    /**
-     * @return string
-     */
-    public function getExcerptAttribute()
-    {
-        return $this->stripShortcodes($this->post_excerpt);
-    }
+    // /**
+    // * @return string
+    // */
+    // public function getExcerptAttribute()
+    // {
+    // return $this->stripShortcodes($this->post_excerpt);
+    // }
 
     /**
      * Gets the featured image if any
@@ -304,14 +285,20 @@ class Post extends Model
      */
     public function getTermsAttribute()
     {
-        return $this->taxonomies->groupBy(function ($taxonomy) {
-            return $taxonomy->taxonomy == 'post_tag' ?
-                'tag' : $taxonomy->taxonomy;
-        })->map(function ($group) {
-            return $group->mapWithKeys(function ($item) {
-                return [$item->term->slug => $item->term->name];
-            });
-        })->toArray();
+        return $this->taxonomies->groupBy(
+            static function ($taxonomy) {
+                return $taxonomy->taxonomy === 'post_tag' ?
+                    'tag' : $taxonomy->taxonomy;
+            }
+        )->map(
+            static function ($group) {
+                return $group->mapWithKeys(
+                    static function ($item) {
+                        return [$item->term->slug => $item->term->name];
+                    }
+                );
+            }
+        )->toArray();
     }
 
     /**
@@ -342,9 +329,11 @@ class Post extends Model
      */
     public function getKeywordsAttribute()
     {
-        return collect($this->terms)->map(function ($taxonomy) {
-            return collect($taxonomy)->values();
-        })->collapse()->toArray();
+        return collect($this->terms)->map(
+            static function ($taxonomy) {
+                return collect($taxonomy)->values();
+            }
+        )->collapse()->toArray();
     }
 
     /**
@@ -398,6 +387,7 @@ class Post extends Model
 
     /**
      * @param string $key
+     *
      * @return mixed
      */
     public function __get($key)

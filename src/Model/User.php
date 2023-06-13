@@ -6,7 +6,6 @@ use Corcel\Concerns\AdvancedCustomFields;
 use Corcel\Concerns\Aliases;
 use Corcel\Concerns\MetaFields;
 use Corcel\Concerns\OrderScopes;
-use Corcel\Model;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword;
 
@@ -18,7 +17,7 @@ use Illuminate\Contracts\Auth\CanResetPassword;
  * @author Mickael Burguet <www.rundef.com>
  * @author Junior Grossi <juniorgro@gmail.com>
  */
-class User extends Model implements Authenticatable, CanResetPassword
+class User extends \Illuminate\Database\Eloquent\Model implements Authenticatable, CanResetPassword
 {
     const CREATED_AT = 'user_registered';
     const UPDATED_AT = null;
@@ -203,6 +202,7 @@ class User extends Model implements Authenticatable, CanResetPassword
 
     /**
      * @param mixed $value
+     *
      * @return void
      */
     public function setUpdatedAt($value)

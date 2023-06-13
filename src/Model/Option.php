@@ -2,7 +2,6 @@
 
 namespace Corcel\Model;
 
-use Corcel\Model;
 use Exception;
 
 /**
@@ -12,7 +11,7 @@ use Exception;
  * @author José CI <josec89@gmail.com>
  * @author Junior Grossi <juniorgro@gmail.com>
  */
-class Option extends Model
+class Option extends \Illuminate\Database\Eloquent\Model
 {
     /**
      * @var string
@@ -61,7 +60,8 @@ class Option extends Model
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
+     *
      * @return Option
      */
     public static function add($key, $value)
@@ -74,6 +74,7 @@ class Option extends Model
 
     /**
      * @param string $name
+     *
      * @return mixed
      */
     public static function get($name)
@@ -86,8 +87,8 @@ class Option extends Model
     }
 
     /**
-     * @return array
      * @deprecated
+     * @return array
      */
     public static function getAll()
     {
@@ -96,6 +97,7 @@ class Option extends Model
 
     /**
      * @param array $keys
+     *
      * @return array
      */
     public static function asArray($keys = [])

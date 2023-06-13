@@ -12,51 +12,69 @@ Corcel is a collection of PHP classes built on top of [Eloquent ORM](https://lar
 
 You can use WordPress as the backend (administration panel) or CMS, for inserting posts, custom types, etc, and any other PHP app in the other side querying those data (as a Model layer). It's easier to use Corcel with Laravel, but you're free to use it with any PHP project that uses Composer.
 
-<a href="https://ko-fi.com/A36513JF" target="_blank">Buy me a Coffee</a> | 
+<a href="https://ko-fi.com/A36513JF" target="_blank">Buy me a Coffee</a> |
 <a href="https://twitter.com/corcelphp" target="_blank">Follow Corcel on Twitter</a>
 
 # Table of Contents
+
 # <a id="install"></a> Installing Corcel
 
-
+- [Table of Contents](#table-of-contents)
+- [ Installing Corcel](#-installing-corcel)
 - [Version Compatibility](#version-compatibility)
-- [Installing Corcel](#installing-corcel)
-- [Database Setup](#database-setup)
-- [Usage](#usage)
-    - [Posts](#posts)
-    - [Advanced Custom Fields (ACF) Integration](#acf)
-    - [Custom Post Type](#custom-post)
-    - [Single Table Inheritance](#single-tab)
-    - [Taxonomies](#taxonomies)
-    - [Post Format](#post-format)
-    - [Pages](#pages)
-    - [Categories & Taxonomies](#cats)
-    - [Attachments & Revision](#attachments)
-    - [Thumbnails](#thumbnails)
-    - [Options](#options)
-    - [Menu](#menu)
-    - [Users](#users)
-    - [Authentication](#auth)
-    - [Running Tests](#tests)
-- [Contributing](#contrib)
-- [License](#license)
+- [ Installing Corcel](#-installing-corcel-1)
+  - [Configuring (Laravel)](#configuring-laravel)
+    - [ Laravel 5.5 and newer](#-laravel-55-and-newer)
+    - [ Laravel 5.4 and older](#-laravel-54-and-older)
+- [ Database Setup](#-database-setup)
+  - [Laravel Setup](#laravel-setup)
+  - [Other PHP Framework (not Laravel) Setup](#other-php-framework-not-laravel-setup)
+- [ Usage](#-usage)
+  - [ Posts](#-posts)
+  - [Creating your own model classes](#creating-your-own-model-classes)
+    - [Meta Data (Custom Fields)](#meta-data-custom-fields)
+    - [Querying Posts by Custom Fields (Meta)](#querying-posts-by-custom-fields-meta)
+    - [Fields Aliases](#fields-aliases)
+    - [Custom Scopes](#custom-scopes)
+    - [Pagination](#pagination)
+  - [ Advanced Custom Fields (ACF)](#-advanced-custom-fields-acf)
+  - [ Custom Post Type](#-custom-post-type)
+    - [Configuring the returning Instance](#configuring-the-returning-instance)
+      - [Registering Post Types (the easy way)](#registering-post-types-the-easy-way)
+      - [Registering Post Types (the hard way)](#registering-post-types-the-hard-way)
+  - [Taxonomies](#taxonomies)
+  - [Post Format](#post-format)
+  - [Pages](#pages)
+  - [Categories and Taxonomies](#categories-and-taxonomies)
+  - [Attachment and Revision](#attachment-and-revision)
+  - [Thumbnails](#thumbnails)
+  - [Options](#options)
+  - [ Menu](#-menu)
+    - [Multi-levels Menus](#multi-levels-menus)
+  - [ Users](#-users)
+  - [Authentication](#authentication)
+    - [Using Laravel](#using-laravel)
+    - [Not using Laravel](#not-using-laravel)
+- [ Running Tests](#-running-tests)
+- [ Contributing](#-contributing)
+  - [ Licence](#-licence)
 
 # Version Compatibility
 
- Laravel  | Corcel
-:---------|:----------
- 5.1.x    | `~2.1.0`
- 5.2.x    | `~2.2.0`
- 5.3.x    | `~2.3.0`
- 5.4.x    | `~2.4.0`
- 5.5.x    | `~2.5.0`
- 5.6.x    | `~2.6.0`
- 5.7.x    | `~2.7.0`
- 5.8.x    | `~2.8.0`
- 6.0.x    | `^3.0.0`
- 7.0.x    | `^4.0.0`
- 8.0.x    | `^5.0.0`
- 9.0.x    | `^6.0.0`
+| Laravel | Corcel   |
+| :------ | :------- |
+| 5.1.x   | `~2.1.0` |
+| 5.2.x   | `~2.2.0` |
+| 5.3.x   | `~2.3.0` |
+| 5.4.x   | `~2.4.0` |
+| 5.5.x   | `~2.5.0` |
+| 5.6.x   | `~2.6.0` |
+| 5.7.x   | `~2.7.0` |
+| 5.8.x   | `~2.8.0` |
+| 6.0.x   | `^3.0.0` |
+| 7.0.x   | `^4.0.0` |
+| 8.0.x   | `^5.0.0` |
+| 9.0.x   | `^6.0.0` |
 
 # <a id="installing-corcel"></a> Installing Corcel
 
@@ -84,18 +102,6 @@ You'll have to include `CorcelServiceProvider` in your `config/app.php`:
     Corcel\Laravel\CorcelServiceProvider::class,
 ]
 ```
-
-### <a name="config-publish"></a> Publishing the configuration file
-
-Now configure our config file to make sure your database is set correctly and to allow you to register custom post types and shortcodes in a very easy way:
-
-Run the following Artisan command in your terminal:
-
-```
-php artisan vendor:publish --provider="Corcel\Laravel\CorcelServiceProvider"
-```
-
-Now you have a `config/corcel.php` config file, where you can set the database connection with WordPress tables and much more.
 
 # <a id="database-setup"></a> Database Setup
 
@@ -174,7 +180,7 @@ You can specify all Eloquent params, but some are default (but you can override 
 'prefix'    => 'wp_', // Specify the prefix for WordPress tables, default prefix is 'wp_'
 ```
 
-# <a id="usage"></a>  Usage
+# <a id="usage"></a> Usage
 
 ## <a id="posts"></a> Posts
 
@@ -267,6 +273,7 @@ $trueOrFalse = $post->saveMeta('foo', 'baz'); // boolean
 There are multiples possibilities to query posts by their custom fields (meta) by using scopes on a `Post` (or another other model which uses the `HasMetaFields` trait) class:
 
 To check if a meta key exists, use the `hasMeta()` scope:
+
 ```
 // Finds a published post with a meta flag.
 $post = Post::published()->hasMeta('featured_article')->first();
@@ -344,11 +351,11 @@ foreach ($posts as $post) {
 
 To display the pagination links just call the `links()` method:
 
- ```php
- {{ $posts->links() }}
- ```
+```php
+{{ $posts->links() }}
+```
 
-## <a id="acf"></a>  Advanced Custom Fields (ACF)
+## <a id="acf"></a> Advanced Custom Fields (ACF)
 
 If you want to retrieve a custom field created by the [Advanced Custom Fields (ACF)](http://advancedcustomfields.com) plugin, you have to install the `corcel/acf` plugin - [click here for more information](http://github.com/corcel/acf) - and call the custom field like this:
 
@@ -432,76 +439,6 @@ $videos = Post::type('video')->status('publish')->get();
 ```
 
 You can also do this for inbuilt classes, such as Page or Post. Simply register the Page or Post class with the associated post type string, and that object will be returned instead of the default one.
-
-## <a id="shortcodes"></a> Shortcodes
-
-### From config (Laravel)
-
-You can map all shortcodes you want inside the `config/corcel.php` file, under the `'shortcodes'` key. In this case you should create your own class that `implements` the `Corcel\Shortcode` interface, that requires a `render()` method:
-
-```php
-'shortcodes' => [
-    'foo' => App\Shortcodes\FooShortcode::class,
-    'bar' => App\Shortcodes\BarShortcode::class,
-],
-```
-
-This is a sample shortcode class:
-
-```php
-class FakeShortcode implements \Corcel\Shortcode
-{
-    /**
-     * @param ShortcodeInterface $shortcode
-     * @return string
-     */
-    public function render(ShortcodeInterface $shortcode)
-    {
-        return sprintf(
-            'html-for-shortcode-%s-%s',
-            $shortcode->getName(),
-            $shortcode->getParameter('one')
-        );
-    }
-}
-```
-
-### In runtime
-
-You can add [shortcodes](https://codex.wordpress.org/Shortcode_API) by calling the `addShortcode` method on the `Post` model :
-
-```php
-// [gallery id="1"]
-Post::addShortcode('gallery', function ($shortcode) {
-    return $shortcode->getName() . '.' . $shortcode->getParameter('id');
-});
-$post = Post::find(1);
-echo $post->content;
-```
-
-> Laravel 5.5 uses Package Auto-Discovery, so doesn't require you to manually add the ServiceProvider
-
-If you are using Laravel, we suggest adding your shortcodes handlers in `App\Providers\AppServiceProvider`, in the `boot` method.
-
-### Shortcode Parsing
-
-Shortcodes are parsed with the [*thunderer/shortcode*](https://github.com/thunderer/Shortcode) library. 
-
-Several different parsers are provided. `RegularParser` is the most technically correct and is provided by default. This is suitable for most cases. However if you encounter some irregularities in your shortcode parsing, you may need to configure Corcel to use the `WordpressParser`, which more faithfully matches WordPress' shortcode regex. To do this, if you are using Laravel, edit the `config/corcel.php` file, and uncomment your preferred parser. Alternatively, you can replace this with a parser of your own.
-
-```php
-'shortcode_parser' => Thunder\Shortcode\Parser\RegularParser::class,
-// 'shortcode_parser' => Thunder\Shortcode\Parser\WordpressParser::class,
-```
-
-If you are not using Laravel, you can to do this in runtime, calling the `setShortcodeParser()` method from any class which uses the `Shortcodes` trait, such as `Post`, for example.
-
-```php
-$post->setShortcodeParser(new WordpressParser());
-echo $post->content; // content parsed with "WordpressParser" class
-```
-
-For more information about the shortcode package, [click here](https://github.com/thunderer/Shortcode).
 
 ## <a id="taxonomies"></a>Taxonomies
 

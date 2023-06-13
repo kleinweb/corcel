@@ -2,15 +2,13 @@
 
 namespace Corcel\Model;
 
-use Corcel\Model;
-
 /**
  * Class TermRelationship.
  *
  * @package Corcel\Model
  * @author Junior Grossi <juniorgro@gmail.com>
  */
-class TermRelationship extends Model
+class TermRelationship extends \Illuminate\Database\Eloquent\Model
 {
     /**
      * @var string
